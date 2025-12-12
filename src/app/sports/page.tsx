@@ -22,7 +22,7 @@ const sportsData = {
     desc: "Analyze every serve, volley, and groundstroke.",
     metrics: [
       { label: "Serve Speed", val: "210", unit: "km/h", icon: Wind },
-      { label: "Spin Rate", val: "3200", unit: "rpm", icon: Target },
+      { label: "Swing speed", val: "3200", unit: "km/h", icon: Target },
       { label: "Impact Force", val: "50", unit: "G", icon: Dumbbell },
     ]
   },
@@ -31,7 +31,7 @@ const sportsData = {
     title: "Cricket",
     desc: "Optimize bowling pace and batting power.",
     metrics: [
-      { label: "Bowl Speed", val: "145", unit: "km/h", icon: Zap },
+      { label: "Ball Speed", val: "145", unit: "km/h", icon: Zap },
       { label: "Bat Swing", val: "110", unit: "km/h", icon: Activity },
       { label: "Run Up", val: "22", unit: "m", icon: Wind },
     ]

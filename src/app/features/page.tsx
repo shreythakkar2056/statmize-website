@@ -14,7 +14,10 @@ import {
   Layers, 
   ChevronLeft,
   ArrowRight,
-  Bluetooth
+  Bluetooth,
+  FileText,
+  Split,
+  BrainCircuit
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -100,7 +103,7 @@ const FeatureBento = () => {
                 <div>
                    <h3 className="text-3xl font-bold text-white mb-4">Hyper-Accurate Speed Tracking</h3>
                    <p className="text-gray-400 text-lg mb-8 max-w-md">
-                      Measure the velocity of your shots with millisecond precision. Our algorithm filters out noise to give you the exact speed of your smash, serve, or bowl.
+                      Get precise speed data for every shot, filtered instantly for accuracy.
                    </p>
                    {/* Visualization Mockup */}
                    <div className="w-full h-32 bg-gradient-to-r from-blue-900/20 to-transparent rounded-xl border border-white/5 flex items-end px-4 pb-4 gap-2">
@@ -112,31 +115,31 @@ const FeatureBento = () => {
              </div>
           </motion.div>
 
-          {/* Item 2: Angle */}
+          {/* Item 2: Shot Classification */}
           <motion.div 
             variants={fadeInUp}
             className="bg-[#1a1a1a] border border-white/5 rounded-3xl p-8 group hover:bg-[#222] transition-colors"
           >
              <div className="w-12 h-12 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center mb-4">
-                <Target size={24} />
+                <BrainCircuit size={24} />
              </div>
-             <h3 className="text-xl font-bold text-white mb-2">Angle Analysis</h3>
+             <h3 className="text-xl font-bold text-white mb-2">Shot Classification</h3>
              <p className="text-gray-400 text-sm">
-                Perfect your technique by analyzing the precise trajectory of your arm and racket.
+                Automatically detects shot types like Smashes, Drives, or Drops using AI.
              </p>
           </motion.div>
 
-          {/* Item 3: Power */}
+          {/* Item 3: Forehand/Backhand */}
           <motion.div 
             variants={fadeInUp}
             className="bg-[#1a1a1a] border border-white/5 rounded-3xl p-8 group hover:bg-[#222] transition-colors"
           >
              <div className="w-12 h-12 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center mb-4">
-                <Zap size={24} />
+                <Split size={24} />
              </div>
-             <h3 className="text-xl font-bold text-white mb-2">Power Metrics</h3>
+             <h3 className="text-xl font-bold text-white mb-2">Forehand vs Backhand</h3>
              <p className="text-gray-400 text-sm">
-                Understand the G-force behind every motion to optimize energy transfer.
+                Detailed breakdown of your shot distribution and technique data.
              </p>
           </motion.div>
 
@@ -149,10 +152,10 @@ const FeatureBento = () => {
 // --- COMPONENT: TECH SPECS (Light Mode) ---
 const TechSpecs = () => {
   const specs = [
-    { title: "AI Core", desc: "On-device processing for instant feedback", icon: Cpu },
-    { title: "Sensors", desc: "High Presicion Monitoring Sensors", icon: Layers },
-    { title: "Connectivity", desc: "Bluetooth 5.0 Low Energy", icon: Bluetooth },
-    { title: "Battery", desc: "7-day battery life with rapid charging", icon: Zap }, // Reusing Zap
+    { title: "AI Analytic Report", desc: "Deep dive insights after every session.", icon: FileText },
+    { title: "Sensors", desc: "High Precision Monitoring Sensors.", icon: Layers },
+    { title: "Connectivity", desc: "Bluetooth 5.0 Low Energy.", icon: Bluetooth },
+    { title: "Battery", desc: "7-day battery life with rapid charging.", icon: Zap },
   ];
 
   return (
@@ -162,7 +165,7 @@ const TechSpecs = () => {
              <div className="md:w-1/3">
                 <h2 className="text-4xl font-bold mb-6">Built for the Elite.</h2>
                 <p className="text-gray-600 text-lg">
-                   The Statmize Band is engineered with aerospace-grade sensors packed into a lightweight, sweat-resistant form factor.
+                   Lightweight, sweat-resistant, and built for the court.
                 </p>
              </div>
              
@@ -203,16 +206,16 @@ const HealthIntegration = () => {
                   Athletic performance isn't just about what happens on the court. It's about how you recover.
                </p>
                
-               <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                     { l: "Heart Rate", i: Heart, c: "text-red-500" },
-                     { l: "Sleep Analysis", i: Moon, c: "text-purple-500" },
-                     { l: "Daily Steps", i: Activity, c: "text-blue-500" },
-                     { l: "SpO₂ Levels", i: Wind, c: "text-cyan-500" }
+                     { l: "HRV Tracking", i: Activity, c: "text-purple-500" },
+                     { l: "Resting Heart Rate", i: Heart, c: "text-red-500" },
+                     { l: "Fatigue Management", i: Moon, c: "text-blue-500" },
+                     { l: "Stress Measurement", i: Wind, c: "text-orange-500" }
                   ].map((item, i) => (
                      <div key={i} className="bg-white p-4 rounded-xl shadow-sm flex items-center gap-3">
                         <item.i className={item.c} size={20} />
-                        {/* FIX: Explicitly set text color to gray-900 so it shows on white bg */}
+                        {/* Explicit text color for readability */}
                         <span className="font-bold text-sm md:text-base text-gray-900">{item.l}</span>
                      </div>
                   ))}
@@ -241,10 +244,10 @@ const FeaturesCTA = () => {
             <p className="text-gray-400 mb-10 text-lg">
                Join the community of athletes using Statmize to redefine their limits.
             </p>
-            < Link href="/get-started" >
-            <button className="bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition-all flex items-center gap-2 mx-auto">
-               Get Your Band <ArrowRight size={20} />
-            </button>
+            <Link href="/get-started">
+                <button className="bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-200 transition-all flex items-center gap-2 mx-auto">
+                   Get Your Band <ArrowRight size={20} />
+                </button>
             </Link>
          </div>
       </section>
