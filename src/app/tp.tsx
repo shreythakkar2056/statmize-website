@@ -45,8 +45,7 @@ const staggerContainer: Variants = {
 
 // --- COMPONENTS ---
 
-// 1. UPDATED NAVIGATION (Fixes Logo Overlap)
-// 1. UPDATED NAVIGATION (Fixes Mobile Menu Header Alignment)
+// 1. NAVIGATION
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navItems = [
@@ -92,7 +91,6 @@ const Navigation = () => {
                     </button>
                 </Link>
                 
-                {/* Hamburger Button */}
                 <button onClick={() => setIsOpen(true)} className="lg:hidden text-white p-2 relative z-50">
                     <Menu size={28} />
                 </button>
@@ -100,7 +98,7 @@ const Navigation = () => {
         </div>
       </nav>
 
-      {/* --- FULL SCREEN MOBILE MENU OVERLAY --- */}
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isOpen && (
             <motion.div 
@@ -109,29 +107,17 @@ const Navigation = () => {
                exit={{ opacity: 0 }}
                className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col"
             >
-                {/* Mobile Menu Header (Logo Left, Close Right) */}
+                {/* Mobile Header */}
                 <div className="flex justify-between items-center px-6 py-6 border-b border-white/10">
-                    {/* Logo */}
                     <div className="relative w-28 h-8 opacity-80">
-                        <Image 
-                          src="/logo.png" 
-                          alt="Statmize" 
-                          fill 
-                          className="object-contain object-left" 
-                          sizes="150px" 
-                        />
+                        <Image src="/logo.png" alt="Statmize" fill className="object-contain object-left" sizes="150px" />
                     </div>
-
-                    {/* Close Button */}
-                    <button 
-                        onClick={() => setIsOpen(false)} 
-                        className="text-white/80 hover:text-white p-2 transition-colors"
-                    >
+                    <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white p-2">
                         <X size={32} />
                     </button>
                 </div>
 
-                {/* Menu Links Container */}
+                {/* Mobile Links */}
                 <div className="flex flex-col items-center justify-center flex-grow gap-8">
                     {navItems.map((item) => (
                         <Link 
@@ -143,7 +129,6 @@ const Navigation = () => {
                             {item.name}
                         </Link>
                     ))}
-
                     <Link href="/get-started" onClick={() => setIsOpen(false)} className="mt-8">
                         <button className="bg-white text-black px-12 py-4 rounded-full font-bold text-xl hover:scale-105 transition-transform">
                             Get Started
@@ -205,7 +190,6 @@ const Hero = () => {
             </Link>
         </div>
       </motion.div>
-      <br /> <br />
 
       {/* Floating Elements (Visual) */}
       <div className="relative w-full max-w-5xl h-[300px] md:h-[400px] mt-12 md:mt-16 block">
@@ -231,27 +215,9 @@ const Hero = () => {
 // 3. PERFORMANCE CORE
 const PerformanceCore = () => {
   const metrics = [
-    {
-      title: "Speed Tracking",
-      desc: "Measure shot velocity with millisecond precision. Know exactly how fast you strike.",
-      icon: TrendingUp,
-      color: "text-cyan-400",
-      bg: "bg-cyan-400/10 border-cyan-400/20"
-    },
-    {
-      title: "Angle Analysis",
-      desc: "Perfect your form. Our 9-axis sensors map your arm trajectory to find the optimal angle.",
-      icon: Crosshair,
-      color: "text-[#4ADE80]",
-      bg: "bg-[#4ADE80]/10 border-[#4ADE80]/20"
-    },
-    {
-      title: "Power Metrics",
-      desc: "Get instant power analysis for every shot to improve strength, control, and consistency.",
-      icon: Zap,
-      color: "text-[#A06CD5]",
-      bg: "bg-[#A06CD5]/10 border-[#A06CD5]/20"
-    }
+    { title: "Speed Tracking", desc: "Measure shot velocity with millisecond precision.", icon: TrendingUp, color: "text-cyan-400", bg: "bg-cyan-400/10 border-cyan-400/20" },
+    { title: "Angle Analysis", desc: "Perfect your form with 9-axis trajectory mapping.", icon: Crosshair, color: "text-[#4ADE80]", bg: "bg-[#4ADE80]/10 border-[#4ADE80]/20" },
+    { title: "Power Metrics", desc: "Optimize energy transfer for maximum impact.", icon: Zap, color: "text-[#A06CD5]", bg: "bg-[#A06CD5]/10 border-[#A06CD5]/20" }
   ];
 
   return (
@@ -260,10 +226,9 @@ const PerformanceCore = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="mb-10 md:mb-16 md:flex justify-between items-end">
              <div className="max-w-2xl text-center md:text-left">
                 <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Advanced Performance Tracking</h2>
-                <p className="text-gray-400 text-lg">Data is the new unfair advantage. We break down your game into the three metrics that matter most.</p>
+                <p className="text-gray-400 text-lg">Data is the new unfair advantage. We break down your game into the metrics that matter.</p>
              </div>
           </motion.div>
-
           <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-3 gap-6">
              {metrics.map((m, i) => (
                 <motion.div key={i} variants={fadeInUp} className={`p-8 rounded-3xl border ${m.bg} hover:bg-opacity-20 transition-all cursor-default group`}>
@@ -283,24 +248,9 @@ const PerformanceCore = () => {
 // 4. AI ANALYTICS SECTION
 const AIAnalyticsSection = () => {
     const aiFeatures = [
-        {
-            title: "Improvement Tracker",
-            desc: "Weekly progress reports showing exactly how much faster and more accurate your shots are becoming compared to last week.",
-            icon: LineChart,
-            color: "text-blue-400"
-        },
-        {
-            title: "Mistake Detection",
-            desc: "AI analyzes your biomechanics to identify bad habits (like poor wrist position) before they become permanent.",
-            icon: Zap,
-            color: "text-yellow-400"
-        },
-        {
-            title: "Health Correlation",
-            desc: "Understand how your sleep and recovery scores directly impact your shot power and reaction time on the field.",
-            icon: BrainCircuit,
-            color: "text-purple-400"
-        }
+        { title: "Improvement Tracker", desc: "Weekly progress reports on speed and accuracy.", icon: LineChart, color: "text-blue-400" },
+        { title: "Mistake Detection", desc: "AI identifies bad habits before they become permanent.", icon: Zap, color: "text-yellow-400" },
+        { title: "Health Correlation", desc: "See how sleep affects your shot power.", icon: BrainCircuit, color: "text-purple-400" }
     ];
 
     return (
@@ -308,24 +258,14 @@ const AIAnalyticsSection = () => {
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10" />
             <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-center relative z-10">
                 <div className="lg:w-1/2">
-                    <div className="inline-block px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-400 text-xs font-bold uppercase tracking-widest mb-6">
-                        Powered by AI
-                    </div>
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                        Your Personal AI Coach. <br />
-                        <span className="text-gray-500">Available 24/7.</span>
-                    </h2>
-                    <p className="text-gray-400 text-lg mb-10 leading-relaxed">
-                        Raw data is just numbers. Statmize AI connects the dots between your health, your technique, and your results to tell you exactly <strong>what</strong> to fix and <strong>how</strong> to fix it.
-                    </p>
+                    <div className="inline-block px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-400 text-xs font-bold uppercase tracking-widest mb-6">Powered by AI</div>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Your Personal AI Coach.</h2>
+                    <p className="text-gray-400 text-lg mb-10">Statmize AI connects the dots between your health, technique, and results.</p>
                     <div className="space-y-8">
                         {aiFeatures.map((f, i) => (
                             <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.2 }} viewport={{ once: true }} className="flex gap-5">
                                 <div className="mt-1"><f.icon size={24} className={f.color} /></div>
-                                <div>
-                                    <h4 className="text-xl font-bold text-white mb-1">{f.title}</h4>
-                                    <p className="text-gray-500 text-sm leading-relaxed">{f.desc}</p>
-                                </div>
+                                <div><h4 className="text-xl font-bold text-white mb-1">{f.title}</h4><p className="text-gray-500 text-sm">{f.desc}</p></div>
                             </motion.div>
                         ))}
                     </div>
@@ -338,16 +278,8 @@ const AIAnalyticsSection = () => {
                         </div>
                         <div className="h-40 w-full flex items-end justify-between gap-2 mb-8">
                             {[40, 65, 50, 80, 60, 90, 75].map((h, i) => (
-                                <div key={i} style={{ height: `${h}%` }} className="flex-1 bg-gradient-to-t from-purple-900/50 to-purple-500 rounded-t-sm relative group">
-                                </div>
+                                <div key={i} style={{ height: `${h}%` }} className="flex-1 bg-gradient-to-t from-purple-900/50 to-purple-500 rounded-t-sm" />
                             ))}
-                        </div>
-                        <div className="bg-[#222] rounded-xl p-4 flex gap-4 items-center border border-white/5">
-                            <div className="p-3 bg-yellow-500/10 rounded-full text-yellow-500"><Zap size={20} /></div>
-                            <div>
-                                <h5 className="text-white font-bold text-sm">Insight Detected</h5>
-                                <p className="text-gray-400 text-xs">Your recovery score (45%) on Tuesday correlated with a 15% drop in smash power.</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -373,9 +305,7 @@ const StatmizeLoop = () => {
                 { step: "03", title: "Improve", text: "Get personalized drills to fix your game." }
              ].map((item, i) => (
                 <div key={i} className="relative text-center">
-                   <div className="w-24 h-24 mx-auto bg-[#151515] border border-white/10 rounded-full flex items-center justify-center text-3xl font-bold text-[#4ADE80] mb-6 relative z-10 shadow-2xl">
-                      {item.step}
-                   </div>
+                   <div className="w-24 h-24 mx-auto bg-[#151515] border border-white/10 rounded-full flex items-center justify-center text-3xl font-bold text-[#4ADE80] mb-6 relative z-10 shadow-2xl">{item.step}</div>
                    <h3 className="text-2xl font-bold text-white mb-2">{item.title}</h3>
                    <p className="text-gray-400 max-w-xs mx-auto">{item.text}</p>
                 </div>
@@ -389,11 +319,11 @@ const StatmizeLoop = () => {
 // 6. HEALTH METRICS (Dark Mode)
 const HealthMetrics = () => {
   const metrics = [
-    { title: "Injury Prevention", desc: "Monitor workload to prevent overtraining.", icon: ShieldCheck, color: "text-[#F97316]", bg: "bg-[#F97316]/10 border-[#F97316]/20" },
-    { title: "Sleep Cycle", desc: "Track deep sleep and REM for recovery.", icon: Moon, color: "text-[#A06CD5]", bg: "bg-[#A06CD5]/10 border-[#A06CD5]/20" },
-    { title: "Recovery Rate", desc: "Know when your body is primed for peak intensity.", icon: BatteryCharging, color: "text-[#4ADE80]", bg: "bg-[#4ADE80]/10 border-[#4ADE80]/20" },
-    { title: "Heart Rate", desc: "Real-time cardio tracking during drills.", icon: Heart, color: "text-red-500", bg: "bg-red-500/10 border-red-500/20" },
-    { title: "Activity", desc: "Keep track of daily movement on rest days.", icon: Activity, color: "text-blue-400", bg: "bg-blue-400/10 border-blue-400/20" }
+    { title: "Injury Prevention", desc: "Monitor workload.", icon: ShieldCheck, color: "text-[#F97316]", bg: "bg-[#F97316]/10 border-[#F97316]/20" },
+    { title: "Sleep Cycle", desc: "Track recovery.", icon: Moon, color: "text-[#A06CD5]", bg: "bg-[#A06CD5]/10 border-[#A06CD5]/20" },
+    { title: "Recovery Rate", desc: "Prime for peak intensity.", icon: BatteryCharging, color: "text-[#4ADE80]", bg: "bg-[#4ADE80]/10 border-[#4ADE80]/20" },
+    { title: "Heart Rate", desc: "Real-time cardio tracking.", icon: Heart, color: "text-red-500", bg: "bg-red-500/10 border-red-500/20" },
+    { title: "Activity", desc: "Daily movement tracking.", icon: Activity, color: "text-blue-400", bg: "bg-blue-400/10 border-blue-400/20" }
   ];
 
   return (
@@ -404,13 +334,10 @@ const HealthMetrics = () => {
              <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Complete Health Ecosystem</h2>
              <p className="text-gray-400 text-lg max-w-2xl">You can't perform if you don't recover. We track the essentials so you stay game-ready.</p>
           </motion.div>
-
           <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-3 gap-6">
              {metrics.map((m, i) => (
                 <motion.div key={i} variants={fadeInUp} whileHover={{ y: -5 }} className={`p-8 rounded-3xl border ${m.bg} hover:bg-opacity-20 transition-all cursor-default group`}>
-                   <div className={`w-14 h-14 rounded-2xl ${m.bg} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                      <m.icon size={28} className={m.color} />
-                   </div>
+                   <div className={`w-14 h-14 rounded-2xl ${m.bg} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}><m.icon size={28} className={m.color} /></div>
                    <h3 className="text-2xl font-bold text-white mb-3">{m.title}</h3>
                    <p className="text-gray-400 leading-relaxed">{m.desc}</p>
                 </motion.div>
@@ -420,6 +347,7 @@ const HealthMetrics = () => {
     </section>
   );
 };
+
 // 7. APP FEATURES
 const AppFeatures = () => {
   return (
@@ -455,6 +383,7 @@ const AppFeatures = () => {
     </section>
   );
 };
+
 // 8. SPORTS SECTION
 const SportsSection = () => {
     const sports = [
@@ -470,7 +399,6 @@ const SportsSection = () => {
                     <h2 className="text-4xl font-bold text-white mb-4">Optimized for Multiple Sports</h2>
                     <p className="text-gray-400">Our technology adapts to provide sport-specific analytics.</p>
                 </motion.div>
-
                 <div className="grid md:grid-cols-3 gap-8">
                     {sports.map((sport, i) => (
                         <motion.div key={i} whileHover={{ y: -10 }} className="bg-white/5 border border-white/10 p-8 rounded-3xl relative overflow-hidden group">
@@ -479,8 +407,7 @@ const SportsSection = () => {
                             <ul className="space-y-4">
                                 {sport.metrics.map((m, idx) => (
                                     <li key={idx} className="flex items-center gap-3 text-gray-400 group-hover:text-white transition-colors">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-white/50" />
-                                        {m}
+                                        <div className="w-1.5 h-1.5 rounded-full bg-white/50" /> {m}
                                     </li>
                                 ))}
                             </ul>
@@ -500,34 +427,18 @@ const Footer = () => {
                 <div className="space-y-4">
                      <div className="flex items-center gap-2">
                         <Link href="/" className="relative w-28 h-8"> 
-                            <Image 
-                              src="/logo.png" 
-                              alt="Statmize Logo" 
-                              fill
-                              className="object-contain object-left" 
-                              sizes="150px"
-                            />
+                            <Image src="/logo.png" alt="Statmize Logo" fill className="object-contain object-left" sizes="150px" />
                         </Link>
                     </div>
-                    <p className="text-gray-400 max-w-xs text-sm">
-                        High-precision sensors and AI-powered analysis to help you perfect your technique.
-                    </p>
+                    <p className="text-gray-400 max-w-xs text-sm">High-precision sensors and AI-powered analysis.</p>
                 </div>
                 <div className="flex flex-col gap-4">
                     <h4 className="text-white font-bold">Contact</h4>
-                    <div className="flex items-center gap-3 text-gray-400 text-sm">
-                        <Mail size={16} />
-                        <span>statmize.business@gmail.com</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-gray-400 text-sm">
-                        <MapPin size={16} />
-                        <span>Ahmedabad, Gujarat, India</span>
-                    </div>
+                    <div className="flex items-center gap-3 text-gray-400 text-sm"><Mail size={16} /><span>statmize.business@gmail.com</span></div>
+                    <div className="flex items-center gap-3 text-gray-400 text-sm"><MapPin size={16} /><span>Ahmedabad, Gujarat, India</span></div>
                 </div>
             </div>
-            <div className="mt-20 pt-8 border-t border-white/5 text-center text-gray-600 text-xs">
-                © 2025 Statmize. All rights reserved.
-            </div>
+            <div className="mt-20 pt-8 border-t border-white/5 text-center text-gray-600 text-xs">© 2025 Statmize. All rights reserved.</div>
         </section>
     );
 };
