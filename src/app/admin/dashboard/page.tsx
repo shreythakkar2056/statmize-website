@@ -1,211 +1,202 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { db } from '@/lib/firebase'; // Ensure you have this set up from previous steps
+import { db } from '@/lib/firebase'; 
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { Loader2, Download, User, MessageSquare, Lock, LogOut, CheckCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Loader2, Download, User, MessageSquare, Lock, LogOut, CheckCircle, ClipboardList, X, ExternalLink
+} from 'lucide-react';
 
 export default function AdminDashboard() {
-  // --- AUTH STATE ---
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [secretCode, setSecretCode] = useState('');
   const [authError, setAuthError] = useState('');
-
-  // --- DATA STATE ---
-  const [activeTab, setActiveTab] = useState<'leads' | 'contacts'>('leads');
+  const [activeTab, setActiveTab] = useState<'leads' | 'contacts' | 'surveys'>('leads');
   const [leads, setLeads] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
+  const [surveys, setSurveys] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRecord, setSelectedRecord] = useState<any | null>(null);
 
-  // --- 1. HANDLE LOGIN ---
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // CHANGE THIS CODE TO WHATEVER YOU WANT
     if (secretCode === 'SAD2025') {
         setIsAuthenticated(true);
-        fetchData(); // Load data only after login
+        fetchData(); 
     } else {
         setAuthError('Invalid Access Code');
     }
   };
 
-  // --- 2. FETCH DATA (Both Collections) ---
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch Interest Leads
-      const leadsQuery = query(collection(db, "interest_leads"), orderBy("createdAt", "desc"));
-      const leadsSnap = await getDocs(leadsQuery);
-      setLeads(leadsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const q1 = query(collection(db, "interest_leads"), orderBy("createdAt", "desc"));
+      const s1 = await getDocs(q1);
+      setLeads(s1.docs.map(doc => ({ id: doc.id, type: 'Waitlist', ...doc.data() })));
 
-      // Fetch Contact Messages
-      const contactsQuery = query(collection(db, "contact_messages"), orderBy("createdAt", "desc"));
-      const contactsSnap = await getDocs(contactsQuery);
-      setContacts(contactsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const q2 = query(collection(db, "contact_messages"), orderBy("createdAt", "desc"));
+      const s2 = await getDocs(q2);
+      setContacts(s2.docs.map(doc => ({ id: doc.id, type: 'Contact', ...doc.data() })));
 
+      const q3 = query(collection(db, "survey_responses"), orderBy("createdAt", "desc"));
+      const s3 = await getDocs(q3);
+      setSurveys(s3.docs.map(doc => ({ id: doc.id, type: 'Survey', ...doc.data() })));
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  // --- RENDER: LOGIN SCREEN ---
   if (!isAuthenticated) {
     return (
-        <main className="min-h-screen bg-[#050505] flex items-center justify-center p-6">
+        <main className="min-h-screen bg-[#050505] flex items-center justify-center p-6 text-white">
             <div className="bg-[#121212] border border-white/10 p-8 rounded-2xl w-full max-w-sm text-center">
-                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-white">
-                    <Lock size={32} />
-                </div>
-                <h1 className="text-2xl font-bold text-white mb-2">Admin Access</h1>
-                <p className="text-gray-400 mb-6 text-sm">Enter the secret code to view the dashboard.</p>
-                
+                <Lock size={32} className="mx-auto mb-6" />
+                <h1 className="text-2xl font-bold mb-6">Admin Access</h1>
                 <form onSubmit={handleLogin} className="space-y-4">
-                    <input 
-                        type="password" 
-                        value={secretCode}
-                        onChange={(e) => setSecretCode(e.target.value)}
-                        placeholder="Enter Code"
-                        className="w-full bg-black border border-white/20 rounded-lg p-3 text-white text-center focus:border-[#A06CD5] outline-none transition-colors"
-                    />
+                    <input type="password" value={secretCode} onChange={(e) => setSecretCode(e.target.value)} placeholder="Code" className="w-full bg-black border border-white/20 rounded-lg p-3 text-center outline-none" />
                     {authError && <p className="text-red-500 text-xs">{authError}</p>}
-                    <button className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors">
-                        Unlock Dashboard
-                    </button>
+                    <button className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-all">Unlock</button>
                 </form>
             </div>
         </main>
     );
   }
 
-  // --- RENDER: DASHBOARD ---
   return (
-    <main className="min-h-screen bg-[#F5F5F7] text-black font-sans">
-      
+    <main className="min-h-screen bg-[#F8F9FA] text-black font-sans pb-20">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-8 py-6 flex justify-between items-center sticky top-0 z-10">
-         <div className="flex items-center gap-3">
-            <span className="font-bold text-xl">Statmize Admin</span>
-         </div>
-         <button onClick={() => setIsAuthenticated(false)} className="flex items-center gap-2 text-sm font-bold text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors">
-            <LogOut size={16} /> Logout
-         </button>
+      <header className="bg-white border-b border-gray-200 px-6 py-6 flex justify-between items-center sticky top-0 z-50">
+         <span className="font-black text-xl tracking-tight">Statmize Admin</span>
+         <button onClick={() => setIsAuthenticated(false)} className="text-red-600 font-bold flex items-center gap-2"><LogOut size={16} /> Logout</button>
       </header>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto p-6 md:p-12">
-         
-         {/* Stats & Controls */}
-         <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
-            <div>
-               <h1 className="text-3xl font-bold mb-2">Overview</h1>
-               <div className="flex gap-4">
-                   <div onClick={() => setActiveTab('leads')} className={`cursor-pointer px-4 py-2 rounded-lg border text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === 'leads' ? 'bg-black text-white border-black' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400'}`}>
-                        <User size={16} /> Waitlist Leads <span className="bg-white/20 px-2 rounded-full text-xs">{leads.length}</span>
-                   </div>
-                   <div onClick={() => setActiveTab('contacts')} className={`cursor-pointer px-4 py-2 rounded-lg border text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === 'contacts' ? 'bg-black text-white border-black' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400'}`}>
-                        <MessageSquare size={16} /> Contact Msgs <span className="bg-white/20 px-2 rounded-full text-xs">{contacts.length}</span>
-                   </div>
+      <div className="max-w-7xl mx-auto p-6 lg:p-12">
+         {/* Layout Control */}
+         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10 gap-6">
+            <div className="w-full">
+               <h1 className="text-3xl font-black mb-4">Database Overview</h1>
+               <div className="flex gap-2 bg-gray-100 p-1.5 rounded-2xl overflow-x-auto">
+                   {[
+                       { id: 'leads', icon: <User size={14}/>, label: 'Waitlist', count: leads.length },
+                       { id: 'contacts', icon: <MessageSquare size={14}/>, label: 'Messages', count: contacts.length },
+                       { id: 'surveys', icon: <ClipboardList size={14}/>, label: 'Surveys', count: surveys.length }
+                   ].map((tab) => (
+                       <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === tab.id ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-black'}`}>
+                            {tab.icon} {tab.label} <span className="bg-black/5 px-2 py-0.5 rounded-md ml-1">{tab.count}</span>
+                       </button>
+                   ))}
                </div>
             </div>
-            <button className="flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-black bg-white px-4 py-2 rounded-lg border border-gray-200">
-               <Download size={16} /> Export CSV
-            </button>
          </div>
 
-         {/* Loading State */}
          {loading ? (
-            <div className="flex justify-center py-20"><Loader2 className="animate-spin text-black" size={40} /></div>
+            <div className="flex justify-center py-20"><Loader2 className="animate-spin text-[#A06CD5]" size={40} /></div>
          ) : (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-               
-               {/* --- TABLE: INTEREST LEADS --- */}
-               {activeTab === 'leads' && (
-                   <table className="w-full text-left">
-                      <thead className="bg-gray-50 border-b border-gray-100">
-                         <tr>
-                            <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider">Name</th>
-                            <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider">Email</th>
-                            <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider">Role</th>
-                            <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider">Sport</th>
-                            <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider">Date</th>
-                         </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                         {leads.map((lead) => (
-                            <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
-                               <td className="p-6 font-bold flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><User size={14}/></div>
-                                  {lead.name}
-                               </td>
-                               <td className="p-6 text-gray-600">{lead.email}</td>
-                               <td className="p-6">
-                                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                     lead.role === 'Investor' ? 'bg-green-100 text-green-700' :
-                                     lead.role === 'Coach' ? 'bg-purple-100 text-purple-700' :
-                                     'bg-gray-100 text-gray-700'
-                                  }`}>
-                                     {lead.role}
-                                  </span>
-                               </td>
-                               <td className="p-6 text-gray-600">{lead.sport}</td>
-                               <td className="p-6 text-gray-400 text-sm">
-                                  {lead.createdAt?.seconds ? new Date(lead.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}
-                               </td>
+            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+               {/* Horizontal Scroll Container for Tables */}
+               <div className="overflow-x-auto w-full">
+                    <table className="w-full text-left border-collapse min-w-[600px]">
+                        <thead className="bg-gray-50 border-b border-gray-100">
+                            <tr className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                <th className="p-6">Details</th>
+                                {activeTab === 'leads' && <th className="p-6">Role / Sport</th>}
+                                {activeTab === 'surveys' && <th className="p-6">Confusion / Sport</th>}
+                                <th className="p-6 text-right">Date</th>
                             </tr>
-                         ))}
-                      </tbody>
-                   </table>
-               )}
-
-               {/* --- TABLE: CONTACT MESSAGES --- */}
-               {activeTab === 'contacts' && (
-                   <table className="w-full text-left">
-                      <thead className="bg-gray-50 border-b border-gray-100">
-                         <tr>
-                            <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider">From</th>
-                            <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider">Subject</th>
-                            <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider">Message</th>
-                            <th className="p-6 text-xs font-bold text-gray-400 uppercase tracking-wider">Date</th>
-                         </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                         {contacts.map((msg) => (
-                            <tr key={msg.id} className="hover:bg-gray-50 transition-colors">
-                               <td className="p-6">
-                                  <div className="font-bold text-black">{msg.name}</div>
-                                  <div className="text-xs text-gray-500">{msg.email}</div>
-                               </td>
-                               <td className="p-6">
-                                  <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold">
-                                     {msg.subject || 'General'}
-                                  </span>
-                               </td>
-                               <td className="p-6 text-gray-600 max-w-md truncate" title={msg.message}>
-                                  {msg.message}
-                               </td>
-                               <td className="p-6 text-gray-400 text-sm">
-                                  {msg.createdAt?.seconds ? new Date(msg.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}
-                               </td>
-                            </tr>
-                         ))}
-                      </tbody>
-                   </table>
-               )}
-
-               {/* Empty State */}
-               {((activeTab === 'leads' && leads.length === 0) || (activeTab === 'contacts' && contacts.length === 0)) && (
-                  <div className="p-20 text-center text-gray-400 flex flex-col items-center">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                          <CheckCircle className="text-gray-300" size={32} />
-                      </div>
-                      <p>No data found in this category yet.</p>
-                  </div>
-               )}
+                        </thead>
+                        <tbody className="divide-y divide-gray-50 cursor-pointer">
+                            {(activeTab === 'leads' ? leads : activeTab === 'contacts' ? contacts : surveys).map((item) => (
+                                <tr key={item.id} onClick={() => setSelectedRecord(item)} className="hover:bg-gray-50 transition-colors">
+                                    <td className="p-6">
+                                        <div className="font-bold">{item.name || 'Anonymous'}</div>
+                                        <div className="text-xs text-gray-400">{item.email}</div>
+                                    </td>
+                                    {activeTab === 'leads' && (
+                                        <td className="p-6">
+                                            <div className="text-[10px] font-black uppercase text-blue-600">{item.role}</div>
+                                            <div className="text-xs font-bold text-gray-500">{item.sport}</div>
+                                        </td>
+                                    )}
+                                    {activeTab === 'surveys' && (
+                                        <td className="p-6">
+                                            <div className="text-[10px] font-black uppercase text-purple-600">CONFUSION: {item.confusionScale}/5</div>
+                                            <div className="text-xs font-bold text-gray-500">{item.primarySport}</div>
+                                        </td>
+                                    )}
+                                    <td className="p-6 text-right text-xs text-gray-400 font-bold">
+                                        {item.createdAt?.seconds ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : 'New'}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+               </div>
             </div>
          )}
       </div>
+
+      {/* --- RECORD DETAIL MODAL --- */}
+      <AnimatePresence>
+        {selectedRecord && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedRecord(null)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl overflow-hidden">
+                <div className="flex justify-between items-center mb-8">
+                    <span className="bg-black text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">{selectedRecord.type} Record</span>
+                    <button onClick={() => setSelectedRecord(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X size={20}/></button>
+                </div>
+
+                <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-gray-50 p-4 rounded-2xl">
+                            <label className="text-[10px] font-black text-gray-400 uppercase">Name</label>
+                            <div className="font-bold text-lg">{selectedRecord.name || 'N/A'}</div>
+                        </div>
+                        <div className="bg-gray-50 p-4 rounded-2xl">
+                            <label className="text-[10px] font-black text-gray-400 uppercase">Phone</label>
+                            <div className="font-bold">{selectedRecord.phone || 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-2xl">
+                        <label className="text-[10px] font-black text-gray-400 uppercase">Email Address</label>
+                        <div className="font-bold break-all flex items-center gap-2">{selectedRecord.email} <ExternalLink size={14} className="text-gray-300"/></div>
+                    </div>
+
+                    {/* Conditional Fields based on record type */}
+                    {selectedRecord.type === 'Survey' && (
+                        <div className="space-y-4">
+                            <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
+                                <label className="text-[10px] font-black text-purple-400 uppercase">Key Frustration</label>
+                                <div className="text-sm font-medium leading-relaxed italic">"{selectedRecord.frustrations}"</div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-gray-50 p-4 rounded-2xl">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase">Role</label>
+                                    <div className="font-bold">{selectedRecord.userDescription}</div>
+                                </div>
+                                <div className="bg-gray-50 p-4 rounded-2xl">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase">Sport</label>
+                                    <div className="font-bold">{selectedRecord.primarySport}</div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {selectedRecord.message && (
+                        <div className="bg-gray-50 p-4 rounded-2xl">
+                            <label className="text-[10px] font-black text-gray-400 uppercase">Message</label>
+                            <div className="text-sm leading-relaxed">{selectedRecord.message}</div>
+                        </div>
+                    )}
+                </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
