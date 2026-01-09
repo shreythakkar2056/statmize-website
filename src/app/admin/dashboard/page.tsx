@@ -168,23 +168,35 @@ export default function AdminDashboard() {
 
                     {/* Conditional Fields based on record type */}
                     {selectedRecord.type === 'Survey' && (
-                        <div className="space-y-4">
-                            <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
-                                <label className="text-[10px] font-black text-purple-400 uppercase">Key Frustration</label>
-                                <div className="text-sm font-medium leading-relaxed italic">"{selectedRecord.frustrations}"</div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-gray-50 p-4 rounded-2xl">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase">Role</label>
-                                    <div className="font-bold">{selectedRecord.userDescription}</div>
-                                </div>
-                                <div className="bg-gray-50 p-4 rounded-2xl">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase">Sport</label>
-                                    <div className="font-bold">{selectedRecord.primarySport}</div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+    <div className="space-y-4">
+        <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
+            <label className="text-[10px] font-black text-purple-400 uppercase">Key Frustration</label>
+            <div className="text-sm font-medium leading-relaxed italic">"{selectedRecord.frustrations}"</div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 p-4 rounded-2xl">
+                <label className="text-[10px] font-black text-gray-400 uppercase">Role</label>
+                <div className="font-bold">
+                    {selectedRecord.userDescription === 'Other' 
+                        ? `Other: ${selectedRecord.userDescriptionOther}` 
+                        : selectedRecord.userDescription}
+                </div>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-2xl">
+                <label className="text-[10px] font-black text-gray-400 uppercase">Sport</label>
+                <div className="font-bold">{selectedRecord.primarySport}</div>
+            </div>
+        </div>
+        <div className="bg-gray-50 p-4 rounded-2xl">
+            <label className="text-[10px] font-black text-gray-400 uppercase">Performance Judgment Method</label>
+            <div className="font-bold">
+                {selectedRecord.performanceRely === 'Other' 
+                    ? `Other: ${selectedRecord.performanceRelyOther}` 
+                    : selectedRecord.performanceRely}
+            </div>
+        </div>
+    </div>
+)}
 
                     {selectedRecord.message && (
                         <div className="bg-gray-50 p-4 rounded-2xl">

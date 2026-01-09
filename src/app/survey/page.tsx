@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, CheckCircle, Loader2, ArrowRight, User, Mail, Phone } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -14,8 +14,10 @@ export default function SurveyPage() {
     email: '',
     phone: '',
     userDescription: '',
+    userDescriptionOther: '', // Text for "Other"
     primarySport: '',
     performanceRely: '',
+    performanceRelyOther: '', // Text for "Other"
     confusionScale: 3,
     frustrations: ''
   });
@@ -37,7 +39,7 @@ export default function SurveyPage() {
     }
   };
 
-  const OptionCard = ({ label, value, field }: { label: string, value: string, field: keyof typeof formData }) => (
+  const OptionCard = ({ label, value, field }: { label: string, value: string, field: 'userDescription' | 'performanceRely' | 'frustrations' }) => (
     <div 
       onClick={() => setFormData({ ...formData, [field]: value })}
       className={`p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${
@@ -75,7 +77,7 @@ export default function SurveyPage() {
           <ChevronLeft size={20} /> Back
         </Link>
         <div className="relative w-28 h-8">
-            <Image src="/logo.png" alt="Statmize" fill className="object-contain" loading="eager" sizes="150px" />
+            <Image src="/logo.png" alt="Statmize" fill className="object-contain" sizes="150px" />
         </div>
       </nav>
 
@@ -106,13 +108,23 @@ export default function SurveyPage() {
             <div className="space-y-4">
               <label className="text-lg font-bold text-gray-200">Which best describes you? *</label>
               <div className="grid grid-cols-1 gap-3">
-                {['Athlete', 'Coach / trainer', 'Fitness enthusiast'].map(opt => (
-                  <OptionCard key={opt} label={opt} value={opt} field="userDescription" />
+                {['Athlete', 'Coach / trainer', 'Fitness enthusiast', 'Other'].map(opt => (
+                  <div key={opt} className="space-y-3">
+                    <OptionCard label={opt} value={opt} field="userDescription" />
+                    {opt === 'Other' && formData.userDescription === 'Other' && (
+                        <motion.input 
+                          initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                          type="text" placeholder="Please specify..." value={formData.userDescriptionOther}
+                          onChange={(e) => setFormData({...formData, userDescriptionOther: e.target.value})}
+                          className="w-full bg-black border border-[#A06CD5]/30 rounded-xl p-3 text-sm outline-none focus:border-[#A06CD5]"
+                        />
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
 
-            {/* Sport - FIXED LAYOUT CLUTTER */}
+            {/* Sport */}
             <div className="space-y-4">
               <label className="text-lg font-bold text-gray-200">Primary sport? *</label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -121,7 +133,7 @@ export default function SurveyPage() {
                     key={opt}
                     onClick={() => setFormData({ ...formData, primarySport: opt })}
                     className={`p-4 rounded-xl border text-center font-bold transition-all cursor-pointer ${
-                      formData.primarySport === opt ? 'bg-white text-black border-white' : 'bg-white/5 border-white/10 text-gray-500 hover:border-white/30'
+                      formData.primarySport === opt ? 'bg-white text-black border-white' : 'bg-white/5 border-white/10 text-gray-500'
                     }`}
                   >
                     {opt}
@@ -134,8 +146,18 @@ export default function SurveyPage() {
             <div className="space-y-4">
               <label className="text-lg font-bold text-gray-200">How do you judge your performance? *</label>
               <div className="grid grid-cols-1 gap-3">
-                {['Coach feedback', 'Intuition / Feeling', 'Match results', 'Basic fitness stats'].map(opt => (
-                  <OptionCard key={opt} label={opt} value={opt} field="performanceRely" />
+                {['Coach feedback', 'My own feeling / intuition', 'Match result', 'Basic fitness stats', 'Other'].map(opt => (
+                  <div key={opt} className="space-y-3">
+                    <OptionCard label={opt} value={opt} field="performanceRely" />
+                    {opt === 'Other' && formData.performanceRely === 'Other' && (
+                        <motion.input 
+                          initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                          type="text" placeholder="Please specify..." value={formData.performanceRelyOther}
+                          onChange={(e) => setFormData({...formData, performanceRelyOther: e.target.value})}
+                          className="w-full bg-black border border-[#A06CD5]/30 rounded-xl p-3 text-sm outline-none focus:border-[#A06CD5]"
+                        />
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -153,7 +175,7 @@ export default function SurveyPage() {
                     type="button" key={num}
                     onClick={() => setFormData({ ...formData, confusionScale: num })}
                     className={`flex-1 h-12 rounded-xl font-bold transition-all border ${
-                      formData.confusionScale === num ? 'bg-[#A06CD5] border-[#A06CD5] text-white shadow-lg' : 'bg-white/5 border-white/10 text-gray-500'
+                      formData.confusionScale === num ? 'bg-[#A06CD5] border-[#A06CD5] text-white' : 'bg-white/5 border-white/10 text-gray-500'
                     }`}
                   >
                     {num}
