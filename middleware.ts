@@ -15,8 +15,10 @@ export function middleware(request: NextRequest) {
     path.startsWith('/_next') || 
     path.startsWith('/static') || 
     path.includes('.') ||
-    path.startsWith('/admin') // Allow API routes (if any)
-
+    path.startsWith('/admin') ||
+    path.startsWith('/suervey') ||
+    path.startsWith('/scan')||
+    path.startsWith('/contact')
   // 3. If it's an allowed path, let them through
   if (isAllowedPath) {
     return NextResponse.next()
