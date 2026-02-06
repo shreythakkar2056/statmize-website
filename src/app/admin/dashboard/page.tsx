@@ -1,21 +1,27 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { db } from '@/lib/firebase'; 
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Loader2, Download, User, MessageSquare, Lock, LogOut, CheckCircle, ClipboardList, X, ExternalLink
+  Loader2, Download, User, MessageSquare, Lock, LogOut, CheckCircle, ClipboardList, X, ExternalLink, Rocket
 } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [secretCode, setSecretCode] = useState('');
   const [authError, setAuthError] = useState('');
-  const [activeTab, setActiveTab] = useState<'leads' | 'contacts' | 'surveys'>('leads');
+  
+  // --- TABS ---
+  const [activeTab, setActiveTab] = useState<'leads' | 'contacts' | 'surveys' | 'launch'>('leads');
+  
+  // --- DATA STATES ---
   const [leads, setLeads] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [surveys, setSurveys] = useState<any[]>([]);
+  const [launchList, setLaunchList] = useState<any[]>([]); // New State for Launch List
+  
   const [loading, setLoading] = useState(true);
   const [selectedRecord, setSelectedRecord] = useState<any | null>(null);
 
@@ -32,17 +38,26 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
+      // 1. Interest Leads
       const q1 = query(collection(db, "interest_leads"), orderBy("createdAt", "desc"));
       const s1 = await getDocs(q1);
       setLeads(s1.docs.map(doc => ({ id: doc.id, type: 'Waitlist', ...doc.data() })));
 
+      // 2. Contact Messages
       const q2 = query(collection(db, "contact_messages"), orderBy("createdAt", "desc"));
       const s2 = await getDocs(q2);
       setContacts(s2.docs.map(doc => ({ id: doc.id, type: 'Contact', ...doc.data() })));
 
+      // 3. Survey Responses
       const q3 = query(collection(db, "survey_responses"), orderBy("createdAt", "desc"));
       const s3 = await getDocs(q3);
       setSurveys(s3.docs.map(doc => ({ id: doc.id, type: 'Survey', ...doc.data() })));
+
+      // 4. NEW: Launch Day Waitlist
+      const q4 = query(collection(db, "launch_day_waitlist"), orderBy("timestamp", "desc"));
+      const s4 = await getDocs(q4);
+      setLaunchList(s4.docs.map(doc => ({ id: doc.id, type: 'Launch Access', ...doc.data() })));
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -83,7 +98,9 @@ export default function AdminDashboard() {
                    {[
                        { id: 'leads', icon: <User size={14}/>, label: 'Waitlist', count: leads.length },
                        { id: 'contacts', icon: <MessageSquare size={14}/>, label: 'Messages', count: contacts.length },
-                       { id: 'surveys', icon: <ClipboardList size={14}/>, label: 'Surveys', count: surveys.length }
+                       { id: 'surveys', icon: <ClipboardList size={14}/>, label: 'Surveys', count: surveys.length },
+                       // NEW TAB
+                       { id: 'launch', icon: <Rocket size={14}/>, label: 'Temporary List', count: launchList.length }
                    ].map((tab) => (
                        <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 whitespace-nowrap transition-all ${activeTab === tab.id ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-black'}`}>
                             {tab.icon} {tab.label} <span className="bg-black/5 px-2 py-0.5 rounded-md ml-1">{tab.count}</span>
@@ -105,16 +122,19 @@ export default function AdminDashboard() {
                                 <th className="p-6">Details</th>
                                 {activeTab === 'leads' && <th className="p-6">Role / Sport</th>}
                                 {activeTab === 'surveys' && <th className="p-6">Confusion / Sport</th>}
+                                {activeTab === 'launch' && <th className="p-6">Source</th>}
                                 <th className="p-6 text-right">Date</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 cursor-pointer">
-                            {(activeTab === 'leads' ? leads : activeTab === 'contacts' ? contacts : surveys).map((item) => (
+                            {(activeTab === 'leads' ? leads : activeTab === 'contacts' ? contacts : activeTab === 'surveys' ? surveys : launchList).map((item) => (
                                 <tr key={item.id} onClick={() => setSelectedRecord(item)} className="hover:bg-gray-50 transition-colors">
                                     <td className="p-6">
-                                        <div className="font-bold">{item.name || 'Anonymous'}</div>
-                                        <div className="text-xs text-gray-400">{item.email}</div>
+                                        <div className="font-bold">{item.name || item.email || 'Anonymous'}</div>
+                                        {item.name && <div className="text-xs text-gray-400">{item.email}</div>}
                                     </td>
+                                    
+                                    {/* Existing Tabs Logic */}
                                     {activeTab === 'leads' && (
                                         <td className="p-6">
                                             <div className="text-[10px] font-black uppercase text-blue-600">{item.role}</div>
@@ -127,8 +147,19 @@ export default function AdminDashboard() {
                                             <div className="text-xs font-bold text-gray-500">{item.primarySport}</div>
                                         </td>
                                     )}
+
+                                    {/* NEW: Launch List Column */}
+                                    {activeTab === 'launch' && (
+                                        <td className="p-6">
+                                            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                                                {item.source || 'Genesis'}
+                                            </span>
+                                        </td>
+                                    )}
+
                                     <td className="p-6 text-right text-xs text-gray-400 font-bold">
-                                        {item.createdAt?.seconds ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : 'New'}
+                                        {/* Handle both 'createdAt' (old) and 'timestamp' (new launch list) */}
+                                        {(item.createdAt || item.timestamp)?.seconds ? new Date((item.createdAt || item.timestamp).seconds * 1000).toLocaleDateString() : 'New'}
                                     </td>
                                 </tr>
                             ))}
@@ -151,52 +182,57 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-gray-50 p-4 rounded-2xl">
-                            <label className="text-[10px] font-black text-gray-400 uppercase">Name</label>
-                            <div className="font-bold text-lg">{selectedRecord.name || 'N/A'}</div>
-                        </div>
-                        <div className="bg-gray-50 p-4 rounded-2xl">
-                            <label className="text-[10px] font-black text-gray-400 uppercase">Phone</label>
-                            <div className="font-bold">{selectedRecord.phone || 'N/A'}</div>
-                        </div>
-                    </div>
                     <div className="bg-gray-50 p-4 rounded-2xl">
                         <label className="text-[10px] font-black text-gray-400 uppercase">Email Address</label>
-                        <div className="font-bold break-all flex items-center gap-2">{selectedRecord.email} <ExternalLink size={14} className="text-gray-300"/></div>
+                        <div className="font-bold break-all flex items-center gap-2 text-xl">{selectedRecord.email} <ExternalLink size={16} className="text-gray-300"/></div>
                     </div>
 
-                    {/* Conditional Fields based on record type */}
+                    {/* Launch List Specific */}
+                    {selectedRecord.type === 'Launch Access' && (
+                        <div className="bg-green-50 p-4 rounded-2xl border border-green-100">
+                            <label className="text-[10px] font-black text-green-600 uppercase">Status</label>
+                            <div className="text-lg font-black text-green-800">Early Access Requested</div>
+                            <p className="text-xs text-green-600 mt-1">Source: {selectedRecord.source}</p>
+                        </div>
+                    )}
+
+                    {/* Regular Contact Info (if available) */}
+                    {selectedRecord.name && (
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-gray-50 p-4 rounded-2xl">
+                                <label className="text-[10px] font-black text-gray-400 uppercase">Name</label>
+                                <div className="font-bold">{selectedRecord.name}</div>
+                            </div>
+                            {selectedRecord.phone && (
+                                <div className="bg-gray-50 p-4 rounded-2xl">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase">Phone</label>
+                                    <div className="font-bold">{selectedRecord.phone}</div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Survey Specifics */}
                     {selectedRecord.type === 'Survey' && (
-    <div className="space-y-4">
-        <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
-            <label className="text-[10px] font-black text-purple-400 uppercase">Key Frustration</label>
-            <div className="text-sm font-medium leading-relaxed italic">"{selectedRecord.frustrations}"</div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-4 rounded-2xl">
-                <label className="text-[10px] font-black text-gray-400 uppercase">Role</label>
-                <div className="font-bold">
-                    {selectedRecord.userDescription === 'Other' 
-                        ? `Other: ${selectedRecord.userDescriptionOther}` 
-                        : selectedRecord.userDescription}
-                </div>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-2xl">
-                <label className="text-[10px] font-black text-gray-400 uppercase">Sport</label>
-                <div className="font-bold">{selectedRecord.primarySport}</div>
-            </div>
-        </div>
-        <div className="bg-gray-50 p-4 rounded-2xl">
-            <label className="text-[10px] font-black text-gray-400 uppercase">Performance Judgment Method</label>
-            <div className="font-bold">
-                {selectedRecord.performanceRely === 'Other' 
-                    ? `Other: ${selectedRecord.performanceRelyOther}` 
-                    : selectedRecord.performanceRely}
-            </div>
-        </div>
-    </div>
-)}
+                        <div className="space-y-4">
+                            <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
+                                <label className="text-[10px] font-black text-purple-400 uppercase">Key Frustration</label>
+                                <div className="text-sm font-medium leading-relaxed italic">"{selectedRecord.frustrations}"</div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-gray-50 p-4 rounded-2xl">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase">Role</label>
+                                    <div className="font-bold">
+                                        {selectedRecord.userDescription === 'Other' ? `Other: ${selectedRecord.userDescriptionOther}` : selectedRecord.userDescription}
+                                    </div>
+                                </div>
+                                <div className="bg-gray-50 p-4 rounded-2xl">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase">Sport</label>
+                                    <div className="font-bold">{selectedRecord.primarySport}</div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {selectedRecord.message && (
                         <div className="bg-gray-50 p-4 rounded-2xl">
