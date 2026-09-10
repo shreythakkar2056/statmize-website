@@ -73,7 +73,7 @@ export default function ContactPage() {
                  </div>
                  <div>
                    <h3 className="font-bold text-lg">General Inquiries</h3>
-                   <p className="text-gray-400">statmize.business@gmail.com</p>
+                   <p className="text-gray-400">info@statmize.in</p>
                  </div>
                </div>
 

@@ -517,7 +517,7 @@ const Footer = () => {
                     <h4 className="text-white font-bold">Contact</h4>
                     <div className="flex items-center gap-3 text-gray-400 text-sm">
                         <Mail size={16} />
-                        <span>statmize.business@gmail.com</span>
+                        <span>info@statmize.in</span>
                     </div>
                     <div className="flex items-center gap-3 text-gray-400 text-sm">
                         <MapPin size={16} />
